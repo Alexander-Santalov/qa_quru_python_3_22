@@ -6,6 +6,7 @@ class DemoQaWithEnv:
     def __init__(self, env):
         self.demoqa = BaseSession(url=Hosts(env).demoqa)
         self.reqres = BaseSession(url=Hosts(env).reqres)
+        self.url_demowebshop = Hosts(env).demoqa
 
     def login(self, email, password):
         return self.demoqa.post(
@@ -42,5 +43,5 @@ class DemoQaWithEnv:
         return self.reqres
 
     @property
-    def session_demoqa(self):
-        return self.demoqa
+    def url_demoqa(self):
+        return self.url_demowebshop

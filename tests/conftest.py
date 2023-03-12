@@ -1,4 +1,5 @@
 import os
+
 import pytest
 from dotenv import load_dotenv
 from selene.support.shared import browser
@@ -18,9 +19,9 @@ def demoshop(request):
     return DemoQaWithEnv(env)
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='function')
 def app(demoshop):
-    browser.config.base_url = "https://demowebshop.tricentis.com/"
+    browser.config.base_url = demoshop.url_demoqa
     browser.config.window_width = 1920
     browser.config.window_height = 1080
     response = demoshop.login(os.getenv("LOGIN"), os.getenv("PASSWORD"))
