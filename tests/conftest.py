@@ -7,6 +7,7 @@ from selene.support.shared import browser
 from framework.demoqa_with_env import DemoQaWithEnv
 
 load_dotenv()
+authorization_cookie = None
 
 
 def pytest_addoption(parser):
@@ -19,16 +20,19 @@ def demoshop(request):
     return DemoQaWithEnv(env)
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture()
 def app(demoshop):
-    browser.config.base_url = demoshop.url_demoqa
+    global authorization_cookie
+    browser.config.base_url = demoshop.demoqa.url
     browser.config.window_width = 1920
     browser.config.window_height = 1080
-    response = demoshop.login(os.getenv("LOGIN"), os.getenv("PASSWORD"))
-    authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
+    if authorization_cookie is None:
+        response = demoshop.login(os.getenv("LOGIN"), os.getenv("PASSWORD"))
+        authorization_cookie = response.cookies.get("NOPCOMMERCE.AUTH")
     browser.open("Themes/DefaultClean/Content/images/logo.png")
     browser.driver.add_cookie({"name": "NOPCOMMERCE.AUTH", "value": authorization_cookie})
-    return browser
+    yield browser
+    browser.quit()
 
 
 @pytest.fixture(scope='session')
